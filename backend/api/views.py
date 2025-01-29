@@ -9,11 +9,15 @@ import json
 from products.models import Product
 from products.serializers import ProductSerializer
 
-@api_view(['GET'])
+@api_view(['POST'])
 def api_home(request, *args, **kwarg): 
-    instance = Product.objects.all().order_by("?").first()
     
-    data = ProductSerializer(instance).data
-                       
+    serializer=ProductSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+       #print(type(serializer.data))
+       instance = serializer.save()
+       print(type(instance))
+       data = serializer.data
+       print(type(data))                   
     return Response(data)
 
