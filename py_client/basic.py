@@ -1,7 +1,11 @@
 import requests
 
-endpoint = 'https://httpbin.org/anything'
+endpoint = "http://127.0.0.1:8000/api/"
 
 response = requests.get(endpoint)
-response = response.json()
-print(response)
+
+print(response.status_code)
+
+response_py = response.json()
+print(response_py)
+
