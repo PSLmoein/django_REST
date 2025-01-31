@@ -1,4 +1,4 @@
-from rest_framework import generics, mixins
+from rest_framework import generics, mixins , permissions, authentication
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -20,6 +20,9 @@ pdv = ProductDetailAPIView.as_view()
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class=ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.DjangoModelPermissions]
+    
     def perform_create(self, serializer):
         print(serializer.validated_data)
         title = serializer.validated_data.get('name')
@@ -33,6 +36,9 @@ plcv = ProductListCreateAPIView.as_view()
 class ProductUpdateAPIView(generics.UpdateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.DjangoModelPermissions]
+    
     lookup_field = 'pk'
     def perform_update(self, serializer):
         instance = serializer.save()
@@ -44,7 +50,7 @@ puv = ProductUpdateAPIView.as_view()
 class ProductDeleteAPIView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-    lookup_field = 'pk'
+    #lookup_field = 'pk'
     
     def perform_destroy(self, instance):
         super().perform_destroy(instance)
@@ -67,6 +73,14 @@ class ProductMixinView(mixins.ListModelMixin,
         return self.list(request, *args, **kwargs)
     def post(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
+    
+    def perform_create(self, serializer):
+        print(serializer.validated_data)
+        title = serializer.validated_data.get('name')
+        content = serializer.validated_data.get('content') or None
+        if content is None:
+            content = title        
+        serializer.save(content=content)
     
 pmv= ProductMixinView.as_view()
     
