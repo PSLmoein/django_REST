@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -26,11 +26,52 @@ class ProductListCreateAPIView(generics.ListCreateAPIView):
         content = serializer.validated_data.get('content') or None
         if content is None:
             content = title        
-        serializer.save()
+        serializer.save(content=content)
 plcv = ProductListCreateAPIView.as_view()
 
 
+class ProductUpdateAPIView(generics.UpdateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        if not instance.content:
+            instance.content = instance.title
+puv = ProductUpdateAPIView.as_view()
 
+
+class ProductDeleteAPIView(generics.DestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+    
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+pdev = ProductDeleteAPIView.as_view()
+
+class ProductMixinView(mixins.ListModelMixin,
+                       mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       generics.GenericAPIView,
+                       ):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_field = 'pk'
+    
+    def get(self, request, *args, **kwargs):
+        print(args, kwargs)
+        pk = kwargs.get('pk')
+        if pk != None:
+            return self.retrieve(request, *args, **kwargs)
+        return self.list(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+pmv= ProductMixinView.as_view()
+    
+
+"""
 @api_view(['GET','POST'])
 def Product_alt_view(request, pk=None, *args, **kwargs):
     method = request.method 
@@ -64,3 +105,4 @@ def Product_alt_view(request, pk=None, *args, **kwargs):
             return Response(data)
         
 dpav = Product_alt_view
+"""
