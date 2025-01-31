@@ -5,6 +5,6 @@ from . import views
 
 
 urlpatterns = [
-    path('<int:pk>/',views.pdv),
-    path('', views.plcv),    
+    path('<int:pk>/',views.dpav),
+    path('', views.dpav),    
 ]

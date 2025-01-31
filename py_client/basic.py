@@ -6,6 +6,6 @@ response = requests.post(endpoint, params={'qwe': 132}, json={'name':'hello worl
 
 print(response.status_code)
 print(type(response))
-print(response.json())
+#print(response.json())
 #print(response.text)
 
