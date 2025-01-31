@@ -7,6 +7,7 @@ from  django.shortcuts import get_object_or_404
 from .models import Product
 from .serializers import  ProductSerializer
 from .permissions import IsStaffEditorPermission
+from api.authentication import TokenAuthentication
 
 
 # Create your views here.
@@ -21,7 +22,8 @@ pdv = ProductDetailAPIView.as_view()
 class ProductListCreateAPIView(generics.ListCreateAPIView):
     queryset = Product.objects.all()
     serializer_class=ProductSerializer
-    authentication_classes = [authentication.SessionAuthentication]
+    authentication_classes = [authentication.SessionAuthentication,
+                              TokenAuthentication]
     permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
     
     def perform_create(self, serializer):
